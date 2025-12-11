@@ -426,21 +426,21 @@
 
 
         // 정보창
-      const infoWindow = new naver.maps.InfoWindow();
+    const infoWindow = new naver.maps.InfoWindow();
 
         // 정류장 마커 생성
-      route.waypoints.forEach(stop => {
-          let marker = new naver.maps.Marker({
-              position: new naver.maps.LatLng(stop.coord[0], stop.coord[1]),
-              map: map,
-              title: stop.name
-          });
+    route.waypoints.forEach(stop => {
+        let marker = new naver.maps.Marker({
+            position: new naver.maps.LatLng(stop.coord[0], stop.coord[1]),
+            map: map,
+            title: stop.name
+        });
 
-            // 터치/클릭 시 정류장 이름 표시
-          naver.maps.Event.addListener(marker, "click", function () {
-              infoWindow.setContent(`<div class="infowin">${stop.name}</div>`);
-              infoWindow.open(map, marker);
-            });
+        // 터치/클릭 시 정류장 이름 표시
+        naver.maps.Event.addListener(marker, "click", function () {
+            infoWindow.setContent(`<div class="infowin">${stop.name}</div>`);
+            infoWindow.open(map, marker);
+        });
 
 
     map.setCenter(pathCoords[0]);
