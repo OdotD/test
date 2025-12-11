@@ -44,6 +44,11 @@
         let polyline = null;
         let markers = [];
 
+        var infoWindow = new naver.maps.InfoWindow({
+            anchorSkew: true,
+            pixelOffset: new naver.maps.Point(0,-10)
+        });
+
         const routes = {
             route1: {
                 path: [
@@ -102,17 +107,17 @@
                     [33.453353, 126.572629]
                 ],
                 waypoints: [
-                    [33.485799, 126.430855],
-                    [33.479921, 126.451231],
-                    [33.484060, 126.468003],
-                    [33.487241, 126.474101],
-                    [33.484297, 126.480098],
-                    [33.481908, 126.482272],
-                    [33.481821, 126.486307],
-                    [33.485734, 126.491013],
-                    [33.485049, 126.496284],
-                    [33.481443, 126.496476],
-                    [33.453404, 126.572569]
+                    { coord: [33.485799, 126.430855], name: "루스트플레이스외도점" },
+                    { coord: [33.479921, 126.451231], name: "도평초등학교 정문(엘정보통신 앞)" },
+                    { coord: [33.484060, 126.468003], name: "미리내중흥s아파트 맞은편(유드림마트앞)" },
+                    { coord: [33.487241, 126.474101], name: "한국방송통신대학 정류장(노형우체국 방면)" },
+                    { coord: [33.484297, 126.480098], name: "신제주이마트 맞은편(제주은행 앞)" },
+                    { coord: [33.481908, 126.482272], name: "롯데마트 맞은편(롯데마트 정류장)" },
+                    { coord: [33.481821, 126.486307], name: "해오름아파트 정류장(농협은행 앞)" },
+                    { coord: [33.485734, 126.491013], name: "은남동 정류장(신라스테이 앞)" },
+                    { coord: [33.485049, 126.496284], name: "신제주초등학교 정류장(태홍누리안 5차 앞)" },
+                    { coord: [33.481443, 126.496476], name: "KCTV제주방송 정문" },
+                    { coord: [33.453404, 126.572569], name: "제주자유국제자유도시 개발센터" }
                 ]
             },
             route2: {
@@ -120,7 +125,7 @@
                     [33.453353, 126.572629],
                     [33.453380, 126.573155],
                     [33.454997, 126.572975],
-                    [33.454847, 126.571550],
+                    [33.454847, 126.571550], 
                     [33.456209, 126.571387],
                     [33.457782, 126.571604],
                     [33.459416, 126.571198],
@@ -204,7 +209,7 @@
                     [33.489512, 126.538680],
                     [33.493578, 126.534737],
                     [33.495948, 126.532463],
-                    [33.499057, 126.530245],
+                    [33.498724, 126.530403],
                     [33.500711, 126.529089],
                     [33.499726, 126.523197],
                     [33.499804, 126.521320],
@@ -228,7 +233,7 @@
                     [33.489477, 126.538650],
                     [33.493625, 126.534793],
                     [33.495890, 126.532441],
-                    [33.499059, 126.530285],
+                    [33.498716, 126.530362],
                     [33.499769, 126.521318],
                     [33.499957, 126.514640],
                     [33.503264, 126.512959],
@@ -404,37 +409,48 @@
             }
         };
 
+// 노선그리기
+        function drawRoute(routeKey) {
+            const route = routes[routeKey];
 
-  function drawRoute(routeKey) {
-    const route = routes[routeKey];
+            if (polyline) {
+                polyline.setMap(null);
+            }
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
 
-    if (polyline) {
-      polyline.setMap(null);
+            const pathCoords = route.path.map(coord => new naver.maps.LatLng(coord[0], coord[1]));
+
+            polyline = new naver.maps.Polyline({
+                map: map,
+                path: pathCoords,
+                strokeColor: '#FF0000',
+                strokeWeight: 4,
+                strokeOpacity: 0.8,
+            });
+
+            // waypoint 마커 생성 + 클릭 이벤트
+            route.waypoints.forEach(wp => {
+                const marker = new naver.maps.Marker({
+                    position: new naver.maps.LatLng(wp.coord[0], wp.coord[1]),
+                    map: map
+                });
+
+                marker.stopName = wp.name;
+
+                // 터치/클릭 시 말풍선 표시
+                naver.maps.Event.addListener(marker, "click", function () {
+                    infoWindow.setContent(
+                        `<div style="padding:5px 10px; font-size:14px;">${marker.stopName}</div>`
+                    );
+                    infoWindow.open(map, marker); // 마커 바로 옆에 표시됨!
+                });
+
+                markers.push(marker);
+            });
+
+        map.setCenter(pathCoords[0]);
     }
-    markers.forEach(marker => marker.setMap(null));
-    markers = [];
-
-    const pathCoords = route.path.map(coord => new naver.maps.LatLng(coord[0], coord[1]));
-
-    polyline = new naver.maps.Polyline({
-      map: map,
-      path: pathCoords,
-      strokeColor: '#FF0000',
-      strokeWeight: 4,
-      strokeOpacity: 0.8,
-    });
-
-    route.waypoints.forEach((coord, index) => {
-      const marker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(coord[0], coord[1]),
-        map: map,
-        title: '경유지 ${index + 1}'
-      });
-      markers.push(marker);
-    });
-
-    map.setCenter(pathCoords[0]);
-  }
 
 
     </script>
